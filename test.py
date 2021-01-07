@@ -6,7 +6,7 @@ from bitmex_API import current_postion_bitmex,bitmex_quote,market_price_order_bi
 from runner import trade_buySell_Bitmex
 from math import floor
 
-trade_buySell_Bitmex('XBTUSD', 'BTCUSDT', 297)
+#pythtrade_buySell_Bitmex('XBTUSD', 'BTCUSDT', 297)
 """position = current_postion_bitmex('XBTUSD')
 print(position)"""
 #bitmex_quote("XBTUSD")
@@ -14,8 +14,8 @@ print(position)"""
 #df = get_1min_ohlc_df_binance('BTCUSDT', 21)
 #df.to_csv('Testdata.csv')
 
-#df = pd.read_csv('Testdata.csv')
-#back_test_buy(df)
+df = pd.read_csv('Testdata.csv')
+back_test_buy(df)
 
 #output = optimal_distribution_vi(df)
 #print(output)

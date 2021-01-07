@@ -19,7 +19,7 @@ def calculate_buy_or_sell_position(df):
     dpo_par_2 = 200 # 50 ..504 is the new parameter and only one dpo is used see optimisation
     #dpo_par_3 = 600
 
-    vi_par_1 = 10 # 40
+    vi_par_1 = 10 # was 40 but optimised with 10 (570)
     vi_par_2 = 570 # 150
 
     """Find a way to optimise the first parameter with the second, second parameters 
@@ -55,15 +55,15 @@ def calculate_buy_or_sell_position(df):
     print('Compiling all indicators')
 
     # actual compilation
-    """df['buySell'] = np.where(df['buySell_DPO'] & df['buySell_VI'] == 5000, 5000, -5000)
-    df['buySell'] = np.where(df['buySell'] & df_ma['buySell_ma'] == 5000, 5000, -5000)"""
+    df['buySell'] = np.where(df['buySell_DPO'] & df['buySell_VI'] == 5000, 5000, -5000)
+    df['buySell'] = np.where(df['buySell'] & df_ma['buySell_ma'] == 5000, 5000, -5000)
 
     # experimental
     """df['buySell'] = np.where(df['buySell_VI'] & df_ma['buySell_ma'] == 5000, 5000, -5000)
     df_buySell = df"""
 
     # experimental:
-    df['buySell'] = df['buySell_VI']
+    #df['buySell'] = df
     #df_buySell = df
 
     df_buySell = df
