@@ -6,7 +6,7 @@ from bitmex_API import current_postion_bitmex,bitmex_quote,market_price_order_bi
 from runner import trade_buySell_Bitmex
 from math import floor
 
-#pythtrade_buySell_Bitmex('XBTUSD', 'BTCUSDT', 297)
+#trade_buySell_Bitmex('XBTUSD', 'BTCUSDT', 297)
 """position = current_postion_bitmex('XBTUSD')
 print(position)"""
 #bitmex_quote("XBTUSD")

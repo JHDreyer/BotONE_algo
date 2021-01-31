@@ -13,14 +13,14 @@ def calculate_buy_or_sell_position(df):
 
     # using distribution: ma_op 125;
 
-    ma_par = 125 # was 3 higher number decreases the return but decreases the number of trades # 12
+    ma_par = 80 # was 3 higher number decreases the return but decreases the number of trades # 12
     
-    dpo_par_1 = 5 
+    dpo_par_1 = 120 
     dpo_par_2 = 200 # 50 ..504 is the new parameter and only one dpo is used see optimisation
     #dpo_par_3 = 600
 
-    vi_par_1 = 10 # was 40 but optimised with 10 (570)
-    vi_par_2 = 570 # 150
+    vi_par_1 = 108 # was 40 but optimised with 10 (570)
+    #vi_par_2 = 570 # 150
 
     """Find a way to optimise the first parameter with the second, second parameters 
     only optimised for the static first parameter"""
@@ -30,10 +30,10 @@ def calculate_buy_or_sell_position(df):
     df['buySell_ma'] = np.where(df['close'].astype(float) > df_ma['ma'].astype(float), 5000, -5000)
  
     df_dpo = dpo(dpo_par_1, df)
-    df['DPO_MA1'] = df_dpo['DPO'].rolling(window=dpo_par_2, min_periods=0).mean()
+    #df['DPO_MA1'] = df_dpo['DPO'].rolling(window=dpo_par_2, min_periods=0).mean()
     #df['DPO_MA2'] = df_dpo['DPO'].rolling(window=dpo_par_3, min_periods=0).mean()  # was 420
     #df['buySell_DPO'] = np.where(df['DPO_MA1'] > df['DPO_MA2'], 5000, -5000)   
-    df['buySell_DPO'] = np.where(df['DPO_MA1'] > 0, 5000, -5000) # this is the new and imporved dpo
+    df['buySell_DPO'] = np.where(df['DPO'] > 0, 5000, -5000) # this is the new and imporved dpo
 
     '''if plot == True: 
         plt.plot(df_dpo['DPO'], 'k')
@@ -43,9 +43,9 @@ def calculate_buy_or_sell_position(df):
         plt.show()'''
 
     df_vi = vi(vi_par_1, df)
-    df['VI_MA+'] = df_vi['VI+'].rolling(window=vi_par_2, min_periods=0).mean()  # was 250 both
-    df['VI_MA-'] = df_vi['VI-'].rolling(window=vi_par_2, min_periods=0).mean()
-    df['buySell_VI'] = np.where(df['VI_MA+'] > df['VI_MA-'], 5000, -5000)
+    #df['VI_MA+'] = df_vi['VI+'].rolling(window=vi_par_2, min_periods=0).mean()  # was 250 both
+    #df['VI_MA-'] = df_vi['VI-'].rolling(window=vi_par_2, min_periods=0).mean()
+    df['buySell_VI'] = np.where(df_vi['VI+'] > df_vi['VI-'], 5000, -5000)
 
     '''if plot == True:
         plt.plot(df['VI_MA+'])
@@ -56,14 +56,14 @@ def calculate_buy_or_sell_position(df):
 
     # actual compilation
     df['buySell'] = np.where(df['buySell_DPO'] & df['buySell_VI'] == 5000, 5000, -5000)
-    df['buySell'] = np.where(df['buySell'] & df_ma['buySell_ma'] == 5000, 5000, -5000)
+    #df['buySell'] = np.where(df['buySell'] & df_ma['buySell_ma'] == 5000, 5000, -5000)
 
     # experimental
     """df['buySell'] = np.where(df['buySell_VI'] & df_ma['buySell_ma'] == 5000, 5000, -5000)
     df_buySell = df"""
 
     # experimental:
-    #df['buySell'] = df
+    #df['buySell'] = df['buySell_VI']
     #df_buySell = df
 
     df_buySell = df
@@ -266,7 +266,7 @@ def back_test_buy(df):
     print(f'The  simple return is: {sumation}\n')
     print(f'The total trades: {int(returns.size)}\n')
     print(f"The total timeperiods: {datapoints} ")
-    print(f"The return per timeperiod is {sumation/(df['close'].size)}%")
+    print(f"The return per trade {sumation/returns.size}%")
 
     plt.title('Returns based on the backtest')
     plt.xlabel(f'Number of trades (Over {round(datapoints/1440)} Days) ')
