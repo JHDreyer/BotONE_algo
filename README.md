@@ -7,7 +7,7 @@ Jargon summary:
 * OHLC data - open, high, low, close data for a particular coin, token or instrument.
 * Long or short position - buy position and a sell position, respectively.
 * Dataframe - a pandas library datastructure similar to an Excel sheet or table with rows and columns.
-
+* logic - if statements.
 
 ## Components of the project:
 
@@ -15,7 +15,7 @@ Jargon summary:
 * binance_API.py and bitmex_API.py contain the API keys, setup of the Client, and functions that evelop functional blocks of API requests that return useful data or make changes to the Client's positions (trades)
 * indicators.py contains the functions, that return a pandas dataframes, of the technical indicator data used to make predictions.
 * backtest.py contains functions that process the financial data and technical indicator values together to make a prediction of the ideal position for the Client (long or short position) and returns the data in dataframe form.
-* logic - if statements.
+
 
 ## Flow of the programme (High level overview):
 
