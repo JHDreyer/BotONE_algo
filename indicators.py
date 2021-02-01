@@ -1,11 +1,11 @@
 import pandas as pd
 
-
+# moving average:
 def ma(timeperiod, dataframe):
     dataframe['ma'] = dataframe['close'].rolling(window=timeperiod, min_periods=0).mean()
     return dataframe
 
-
+# dependent oscillator:
 def dpo(even_timePeriod, dataframe):
 
     dataframe[f'{even_timePeriod}ma'] = dataframe['close'].rolling(window=even_timePeriod, min_periods=0).mean()
@@ -13,7 +13,7 @@ def dpo(even_timePeriod, dataframe):
     dataframe['DPO'] = dataframe['close'] - dataframe['MA_shifted']
     return dataframe
 
-
+# vortex indicator:
 def vi(n, dataframe):
     # VI from github
     df = dataframe.reset_index()

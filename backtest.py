@@ -4,67 +4,47 @@ from indicators import dpo, vi, ma
 import numpy as np
 
 
+# Main function that determines a long or short position for the API Client:
+
 def calculate_buy_or_sell_position(df):
 
-    # Results from experimental testing of parameters
-    # parameters crypto: 3,5,200,600,40,180 (1 minute)
+    '''Results from experimental testing of parameters
+    parameters crypto: 3,5,200,600,40,180 (1 minute)
+    experimental parameters 210, 5, 100, 400, 40, 150'''
 
-    # experimental parameters 210, 5, 100, 400, 40, 150
-
-    # using distribution: ma_op 125;
-
-    ma_par = 80 # was 3 higher number decreases the return but decreases the number of trades # 12
+    # Parameters:
+    ma_par = 80 
     
     dpo_par_1 = 120 
-    dpo_par_2 = 200 # 50 ..504 is the new parameter and only one dpo is used see optimisation
-    #dpo_par_3 = 600
+    dpo_par_2 = 200 
 
-    vi_par_1 = 108 # was 40 but optimised with 10 (570)
-    #vi_par_2 = 570 # 150
+    vi_par_1 = 108
 
     """Find a way to optimise the first parameter with the second, second parameters 
     only optimised for the static first parameter"""
+
+    # Each indicator is called in this function
+    # inidicator functions are called from indicators.py (see above imports)
+    # Logic is used to compare indicator values to the parameters and this produces buy sell indications
+    # An arbitrary 5000 & -5000 is used to indicate a long and short position, respectively
 
     df_ma = ma(ma_par, df)
 
     df['buySell_ma'] = np.where(df['close'].astype(float) > df_ma['ma'].astype(float), 5000, -5000)
  
-    df_dpo = dpo(dpo_par_1, df)
-    #df['DPO_MA1'] = df_dpo['DPO'].rolling(window=dpo_par_2, min_periods=0).mean()
-    #df['DPO_MA2'] = df_dpo['DPO'].rolling(window=dpo_par_3, min_periods=0).mean()  # was 420
-    #df['buySell_DPO'] = np.where(df['DPO_MA1'] > df['DPO_MA2'], 5000, -5000)   
-    df['buySell_DPO'] = np.where(df['DPO'] > 0, 5000, -5000) # this is the new and imporved dpo
-
-    '''if plot == True: 
-        plt.plot(df_dpo['DPO'], 'k')
-        plt.plot(df['DPO_MA1'], 'b')
-        plt.plot(df['DPO_MA2'], 'r')
-        #plt.plot(df['close'], 'g')
-        plt.show()'''
+    df_dpo = dpo(dpo_par_1, df) 
+    df['buySell_DPO'] = np.where(df['DPO'] > 0, 5000, -5000)
 
     df_vi = vi(vi_par_1, df)
-    #df['VI_MA+'] = df_vi['VI+'].rolling(window=vi_par_2, min_periods=0).mean()  # was 250 both
-    #df['VI_MA-'] = df_vi['VI-'].rolling(window=vi_par_2, min_periods=0).mean()
     df['buySell_VI'] = np.where(df_vi['VI+'] > df_vi['VI-'], 5000, -5000)
-
-    '''if plot == True:
-        plt.plot(df['VI_MA+'])
-        plt.plot(df['VI_MA-'])
-        plt.show()'''
 
     print('Compiling all indicators')
 
-    # actual compilation
+    # actual compilation of indicator buying and selling data:
+
     df['buySell'] = np.where(df['buySell_DPO'] & df['buySell_VI'] == 5000, 5000, -5000)
-    #df['buySell'] = np.where(df['buySell'] & df_ma['buySell_ma'] == 5000, 5000, -5000)
-
-    # experimental
-    """df['buySell'] = np.where(df['buySell_VI'] & df_ma['buySell_ma'] == 5000, 5000, -5000)
-    df_buySell = df"""
-
-    # experimental:
-    #df['buySell'] = df['buySell_VI']
-    #df_buySell = df
+    df['buySell'] = np.where(df['buySell'] & df_ma['buySell_ma'] == 5000, 5000, -5000)
+    df_buySell = df
 
     df_buySell = df
     print('Compilation complete')
@@ -79,13 +59,14 @@ def return_on_indicated_trades(df):
     buy_sell = [0]
 
     # get stock price when a trade is indicated (change in buy/sell recommendation)
+
     while i < df.index[-1]:
         if df.loc[i + 1, 'buySell'] > df.loc[i, 'buySell']:
             value_open = df.loc[i + 1, 'open']
-            # df.loc[i+1, 'trade_buy'] = value_open
+        
         if df.loc[i + 1, 'buySell'] < df.loc[i, 'buySell']:
             value_close = df.loc[i, 'close']
-            # df.loc[i, 'trade_sell'] = value_close
+            
         if value_open > 0:
             buy_sell.append(value_open)
         if value_close > 0:
@@ -95,10 +76,11 @@ def return_on_indicated_trades(df):
         value_close = 0
         i += 1
 
+    # The series in a combination of the prices when a trade is made (>0) for a buy, (<0) when sold
     buy_sell = pd.Series(buy_sell)
-    #print(buy_sell)
 
     # calculate return on trades (from buy and sell price, buy+ & sell-)
+    # The difference in prices is calculated thereby the profit or loss of each trade
     i = 0
     returns = []
 
@@ -113,6 +95,10 @@ def return_on_indicated_trades(df):
     final_output = {'total_return': sumation, 'total_trades':returns.size}
 
     return final_output
+
+"""The following 3 functions are experimental but not functional or necessarily accurate:
+    its aim is to calculate the optimal parameters for the indicators as to 
+    maximise the profit per trade"""
 
 def optimal_distribution_ma(df):
 
@@ -219,11 +205,16 @@ def optimal_distribution_vi(df):
     results = {'max_RPT':highest_RPT, 'optimal_parameter':max_parameter}
     return results
 
+# This function is called when a strategy or parameters are tested.
+# The performance of the indicators/strategy is plotted based on historical data.
+
 def back_test_buy(df):
 
     df = calculate_buy_or_sell_position(df)
     datapoints = int(df['close'].size)
 
+    '''Replace code with returns()'''
+    
     i = 0
     value_open = 0
     value_close = 0

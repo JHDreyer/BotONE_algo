@@ -8,9 +8,6 @@ from datetime import datetime as dt
 import time
 
 
-# !!!!!!!!!!!!!!!!!!!!!!!!!!! add functionality to work only with a specified number 
-# of entries in csv, clear oldest entries when new entries are added.
-
 def trade_buySell_Binance(ticker_str):
 
     minute = dt.now().minute
@@ -98,7 +95,8 @@ def trade_buySell_Binance(ticker_str):
 -Order is executed to make changes to position if they (algo/actual) differ
 
 """
-# copy of edited binance function follows
+# copy of edited binance function follows that is edited to work with BitMEX
+
 def trade_buySell_Bitmex(ticker_str_bitmex, ticker_str_binance, trade_amount_usd):
 
     ticker_str = ticker_str_binance
