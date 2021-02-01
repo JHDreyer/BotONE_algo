@@ -26,9 +26,14 @@ Jargon summary:
 
 Note: 2 runner functions exist, Binance and BitMEX are seperate (trade_buy_sell_Binance/BitMEX())
 
-runner.py -> backtest.py(calculate_buy_or_sell_position()) -> bitmex/binance_API.py (financial data pulled) -> backtest.py(calculate_buy_or_sell_position()) -> inicators.py (indicator values generated) -> backtest.py(calculate_buy_or_sell_position()) (long/short position determined) -> runner.py -> bitmex/binance_API.py -> Client position atlered
+runner.py(trade_buy_sell_Binance/Bitmex) -> backtest.py(calculate_buy_or_sell_position()) 
+-> bitmex/binance_API.py (financial data pulled) -> backtest.py(calculate_buy_or_sell_position()) -> inicators.py (indicator values generated) -> 
+backtest.py(calculate_buy_or_sell_position()) (long/short position determined) 
+-> runner.py -> bitmex/binance_API.py -> Client position atlered
 
 ### Logic in runner.py:
 
 Example:
-* When calculate_buy_or_sell_position(), speficies a long position the function first checks what the Client's
+* When calculate_buy_or_sell_position() speficies a long position, the function first checks what the Client's current position.
+* When the position is short, the position is reversed. If it is long the position will remain unchanged.
+* The current position is always checked and then changed or unchanged depending on the prediction of the data pulled from backtest.py.
